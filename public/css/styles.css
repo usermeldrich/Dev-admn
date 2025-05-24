@@ -1,0 +1,25 @@
+body {
+    font-family: Arial;
+    text-align: center;
+}
+
+.veiculos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 20px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 200px;
+}
+
+.card:hover {
+    background-color: #0056b3;
+}
