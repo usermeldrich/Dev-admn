@@ -1,16 +1,23 @@
 <?php
 // Processamento do formulário
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nome = $_POST['nome'];
-    $usuario = $_POST['usuario'];
+    require_once __DIR__ . '/../config/config.php';
+
+    $identificador = $_POST['identificador']; // Pode ser email ou usuário
     $senha = $_POST['senha'];
 
-    // Exemplo fixo de autenticação (substituir depois por banco de dados)
-    if ($usuario === 'admin' && $senha === '1234') {
-        header('Location: /DEV-ADMN/public/painel');
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE (email = :id OR usuario = :id)");
+    $stmt->bindParam(':id', $identificador);
+    $stmt->execute();
+
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($usuario && password_verify($senha, $usuario['senha'])) {
+        // Sessão ou redirecionamento
+        header('Location: /Dev-admn/public/painel');
         exit;
     } else {
-        $erro = "Usuário ou senha incorretos!";
+        $erro = "Usuário/email ou senha incorretos!";
     }
 }
 ?>
@@ -71,6 +78,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: red;
             margin-top: 10px;
         }
+
+        .link-cadastro {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -83,11 +96,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php endif; ?>
 
     <form method="POST">
-        <input type="text" name="nome" placeholder="Seu nome" required><br>
-        <input type="text" name="usuario" placeholder="Usuário" required><br>
+        <input type="text" name="identificador" placeholder="Email ou Usuário" required><br>
         <input type="password" name="senha" placeholder="Senha" required><br>
         <button type="submit">Entrar</button>
     </form>
+
+    <a href="/Dev-admn/public/cadastro">Cadastrar</a>
+
 </div>
 
 </body>

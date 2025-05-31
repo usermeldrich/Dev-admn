@@ -7,7 +7,10 @@ ini_set('display_errors', 1);
 $request = $_SERVER['REQUEST_URI'];
 
 // Remove o caminho do projeto
-$request = str_replace('/DEV-ADMN/public', '', $request);
+$request = str_replace('/Dev-admn/public', '', $request);
+
+// DEBUG TEMPORÁRIO
+var_dump($request); exit;
 
 // Roteamento simples
 switch ($request) {
@@ -24,6 +27,10 @@ switch ($request) {
     case '/devolucao' :
         require __DIR__ . '/../app/views/devolucao.php';
         break;
+    case '/cadastro':
+    require __DIR__ . '/../app/views/cadastro.php';
+    break;
+
     default:
         http_response_code(404);
         echo "Página não encontrada";
