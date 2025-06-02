@@ -26,69 +26,137 @@ body {
 
 
 
- body {
-            background-color: #f7f9fc;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+/* === [LOGIN] === */
+body {
+    background-color: #f0f4f8;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
 
-        .cadastro-container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            width: 400px;
-            text-align: center;
-        }
+.login-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 400px;
+    text-align: center;
+}
 
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+.login-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
 
-        input[type="text"], input[type="email"], input[type="password"] {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
 
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+.login-container button {
+    background-color: #007BFF;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
 
-        button:hover {
-            background-color: #218838;
-        }
+.login-container button:hover {
+    background-color: #0056b3;
+}
 
-        .error, .success {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 6px;
-        }
+.error {
+    color: red;
+    margin-top: 10px;
+}
 
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
+.link-cadastro {
+    text-decoration: none;
+    color: #007BFF;
+}
 
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
+.link-cadastro:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
 
-        .link-voltar {
-            display: block;
-            margin-top: 15px;
-            font-size: 14px;
-        }
+
+/* === [CADASTRO] === */
+body {
+    background-color: #f7f9fc;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.cadastro-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 400px;
+    text-align: center;
+}
+
+.cadastro-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.cadastro-container input[type="text"],
+.cadastro-container input[type="email"],
+.cadastro-container input[type="password"] {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.cadastro-container button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.cadastro-container button:hover {
+    background-color: #218838;
+}
+
+.error,
+.success {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.link-voltar {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+}
