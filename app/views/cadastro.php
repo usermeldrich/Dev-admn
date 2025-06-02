@@ -10,11 +10,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = trim($_POST['usuario']);
     $senha = $_POST['senha'];
 
-    // Verifica campos obrigatórios
     if (empty($nome) || empty($email) || empty($usuario) || empty($senha)) {
         $erro = "Todos os campos são obrigatórios!";
     } else {
-        // Verifica se email ou usuário já existem
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM usuarios WHERE email = :email OR usuario = :usuario");
         $stmt->execute(['email' => $email, 'usuario' => $usuario]);
         $existe = $stmt->fetchColumn();
@@ -22,7 +20,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($existe > 0) {
             $erro = "Email ou nome de usuário já estão em uso!";
         } else {
-            // Insere novo usuário
             $hash = password_hash($senha, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, usuario, senha) VALUES (:nome, :email, :usuario, :senha)");
             $stmt->execute([
