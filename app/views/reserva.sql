@@ -27,3 +27,19 @@ CREATE TABLE solicitacoes (
     data_devolucao TIMESTAMP,
     status VARCHAR(20) DEFAULT 'pendente'
 );
+
+-- Inserção dos carros
+INSERT INTO veiculos (modelo, placa) VALUES 
+('FIAT UNO ADESIVADO', 'QXI-2G02'),
+('FIAT UNO ADESIVADO', 'QXK-1C37'),
+('FIAT UNO QUADRADO', 'PEG-804I'),
+('FIAT UNO QUADRADO', 'NMM-6233'),
+('FIAT STRADA C/ BAÚ', 'QWZ-6E78'),
+('FIAT STRADA C/ BAÚ', 'QWZ-6490'),
+('FIAT STRADA S/ BAÚ', 'QYE-1G28'),
+('FIAT STRADA S/ BAÚ', 'QYE-096I');
+
+-- Inserção das motos
+INSERT INTO veiculos (modelo, placa) VALUES 
+('MOTO CG150 BAÚ', 'PDP-0J82'),
+('MOTO CG150 BAÚ', 'PDP-1B02');
