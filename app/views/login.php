@@ -1,7 +1,10 @@
 <?php
+require_once __DIR__ . '/../config/config.php';
+
 // Processamento do formulário
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_once __DIR__ . '/../config/config.php';
+    session_start();
 
     $identificador = $_POST['identificador']; // Pode ser email ou usuário
     $senha = $_POST['senha'];
@@ -13,7 +16,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($usuario && password_verify($senha, $usuario['senha'])) {
-        // Sessão ou redirecionamento
+        // Inicia sessão
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['usuario_nome'] = $usuario['nome'];
+        $_SESSION['usuario_usuario'] = $usuario['usuario'];
+        $_SESSION['usuario_email'] = $usuario['email'];
+
         header('Location: /Dev-admn/public/painel');
         exit;
     } else {
@@ -21,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -80,10 +89,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .link-cadastro {
-            display: block;
-            margin-top: 15px;
-            font-size: 14px;
-        }
+    text-decoration: none;
+    color: #007BFF;
+}
+
+.link-cadastro:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
     </style>
 </head>
 <body>
@@ -101,7 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Entrar</button>
     </form>
 
-    <a href="/Dev-admn/public/cadastro">Cadastrar</a>
+    <a class="link-cadastro" href="<?= BASE_URL ?>/cadastro">Primeira Vez Aqui? Cadastre-se</a>
+
 
 </div>
 

@@ -1,4 +1,6 @@
 <?php
+define('BASE_URL', 'http://dev-admn.local');
+
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'reserva');
 define('DB_USER', 'postgres');

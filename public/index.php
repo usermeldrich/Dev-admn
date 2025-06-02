@@ -7,33 +7,46 @@ ini_set('display_errors', 1);
 $request = $_SERVER['REQUEST_URI'];
 
 // Remove o caminho do projeto
-$request = str_replace('/Dev-admn/public', '', $request);
+// Define a base da URL corretamente, independente de maiúsculas ou do ambiente
+$base = '/Dev-admn';
+$request = str_replace($base, '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
-// DEBUG TEMPORÁRIO
-var_dump($request); exit;
+//var_dump($request); exit;
+
+
 
 // Roteamento simples
 switch ($request) {
-    case '/' :
-    case '' :
+    
+    case '/public/login' :
+    case '/login':
         require __DIR__ . '/../app/views/login.php';
         break;
-    case '/painel' :
+
+    case '/public/painel':
+    case '/painel':
         require __DIR__ . '/../app/views/painel.php';
         break;
-    case '/solicitar' :
+
+    case '/public/solicitar':
+    case '/solicitar':
         require __DIR__ . '/../app/views/solicitar.php';
         break;
-    case '/devolucao' :
+
+    case '/public/devolucao':
+    case '/devolucao':
         require __DIR__ . '/../app/views/devolucao.php';
         break;
+
+    case '/public/cadastro':
     case '/cadastro':
-    require __DIR__ . '/../app/views/cadastro.php';
-    break;
+        require __DIR__ . '/../app/views/cadastro.php';
+        break;
 
     default:
         http_response_code(404);
         echo "Página não encontrada";
         break;
 }
+
 ?>

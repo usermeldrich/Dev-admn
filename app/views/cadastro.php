@@ -32,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'senha' => $hash
             ]);
             $sucesso = "Usuário cadastrado com sucesso! <a href='/Dev-admn/public'>Clique aqui para logar</a>";
+           
         }
     }
 }
@@ -43,6 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Cadastro</title>
     <style>
+        
+
         body {
             background-color: #f7f9fc;
             font-family: Arial, sans-serif;
@@ -110,6 +113,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 14px;
         }
     </style>
+
+    
 </head>
 <body>
 
@@ -132,8 +137,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Cadastrar</button>
     </form>
 
-    <a class="link-voltar" href="/Dev-admn/public">Já tem conta? Fazer login</a>
+    <a class="link-voltar" href="<?= BASE_URL ?>/login">Já tem conta? Fazer login</a>
 </div>
+
 
 </body>
 </html>

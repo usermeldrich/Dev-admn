@@ -1,5 +1,4 @@
 RewriteEngine On
-RewriteBase /DEV-ADMN/
 
 # Redireciona tudo para index.php se não for arquivo ou pasta
 RewriteCond %{REQUEST_FILENAME} !-f
