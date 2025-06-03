@@ -49,6 +49,20 @@ switch ($request) {
         break;
 
 
+       case '/js/painel.js':
+    header('Content-Type: application/javascript');
+    readfile(__DIR__ . '/../public/js/painel.js');
+    break;
+
+
+        case '/ajax/lista_veiculos.php':
+    require __DIR__ . '/../app/ajax/lista_veiculos.php';
+    break;
+
+case '/ajax/atualiza_veiculo.php':
+    require __DIR__ . '/../app/ajax/atualiza_veiculo.php';
+    break;
+
     default:
         http_response_code(404);
         echo "Página não encontrada";

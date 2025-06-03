@@ -3,12 +3,24 @@ require_once __DIR__ . '/../config/config.php';
 session_start();
 
 // Redireciona se não estiver logado
-if (!isset($_SESSION['usuario_id'])) {
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+$token_sessao = $_SESSION['token_sessao'] ?? null;
+
+if (!$usuario_id || !$token_sessao) {
     header('Location: ' . BASE_URL . '/login');
     exit;
 }
 
-$usuario_id = $_SESSION['usuario_id'];
+// Verifica se o token no banco bate com a sessão atual
+$stmt = $pdo->prepare("SELECT token_sessao FROM usuarios WHERE id = ?");
+$stmt->execute([$usuario_id]);
+$tokenAtual = $stmt->fetchColumn();
+
+if ($tokenAtual !== $token_sessao) {
+    session_destroy();
+    header('Location: ' . BASE_URL . '/login?erro=sessao_encerrada');
+    exit;
+}
 
 // Verifica ações de solicitar ou devolver veículo
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -44,20 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 }
-
-// Busca todos os veículos
-$stmt = $pdo->query("SELECT * FROM veiculos ORDER BY modelo ASC");
-$veiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Verifica quais veículos estão com solicitação pendente
-$stmt = $pdo->query("SELECT veiculo_id, usuario_id FROM solicitacoes WHERE status = 'pendente'");
-$ocupados = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Cria um mapa rápido para saber quem está com qual veículo
-$veiculoOcupadoPor = [];
-foreach ($ocupados as $s) {
-    $veiculoOcupadoPor[$s['veiculo_id']] = $s['usuario_id'];
-}
 ?>
 
 <!DOCTYPE html>
@@ -73,28 +71,10 @@ foreach ($ocupados as $s) {
     <h2>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario_nome']) ?>!</h2>
     <h3>Lista de Veículos</h3>
 
-    <div class="veiculos-lista">
-        <?php foreach ($veiculos as $v): ?>
-            <?php
-                $ocupado = array_key_exists($v['id'], $veiculoOcupadoPor);
-                $ehUsuario = $ocupado && $veiculoOcupadoPor[$v['id']] == $usuario_id;
-            ?>
-            <div class="veiculo-card <?= $ocupado && !$ehUsuario ? 'opaco' : ($ehUsuario ? 'proprio' : '') ?>">
-                <strong><?= htmlspecialchars($v['modelo']) ?> - <?= htmlspecialchars($v['placa']) ?></strong>
-                <form method="POST">
-                    <input type="hidden" name="veiculo_id" value="<?= $v['id'] ?>">
-                    <?php if (!$ocupado): ?>
-                        <button type="submit" name="solicitar">Solicitar</button>
-                    <?php elseif ($ehUsuario): ?>
-                        <button type="submit" name="devolver">Devolver</button>
-                    <?php else: ?>
-                        <button disabled>Indisponível</button>
-                    <?php endif; ?>
-                </form>
-            </div>
-        <?php endforeach; ?>
-    </div>
+    <!-- Div onde a lista será carregada dinamicamente -->
+    <div class="veiculos-lista">Carregando veículos...</div>
 
+    <!-- Acesso Administrativo -->
     <form class="admin-form" method="POST">
         <input type="password" name="senha_admin" placeholder="Senha do administrador">
         <button type="submit" name="acesso_admin">Acesso Administrativo</button>
@@ -104,6 +84,12 @@ foreach ($ocupados as $s) {
         <p class="erro-senha"><?= $erro_admin ?></p>
     <?php endif; ?>
 </div>
+
+<!-- Script de controle AJAX -->
+<script>
+    const USUARIO_ID = <?= json_encode($usuario_id) ?>;
+</script>
+<script src="<?= BASE_URL ?>/js/painel.js"></script>
 
 </body>
 </html>

@@ -1,6 +1,14 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 
+
+// mensagem de login duplicado
+if (isset($_GET['erro']) && $_GET['erro'] === 'sessao_encerrada') {
+    echo "<p style='color:red;'>Sua sessão foi encerrada porque o mesmo usuário fez login em outro local.</p>";
+}
+
+
+
 // Processamento do formulário
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     session_start();
@@ -19,6 +27,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['usuario_nome'] = $usuario['nome'];
         $_SESSION['usuario_usuario'] = $usuario['usuario'];
         $_SESSION['usuario_email'] = $usuario['email'];
+        $_SESSION['token_sessao'] = session_id(); // Cria token único para a sessão
+
+        // Salva o token no banco
+$stmt = $pdo->prepare("UPDATE usuarios SET token_sessao = ? WHERE id = ?");
+$stmt->execute([$_SESSION['token_sessao'], $usuario['id']]);
 
         header('Location: ' . BASE_URL . '/painel');
         exit;

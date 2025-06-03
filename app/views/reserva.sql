@@ -6,6 +6,7 @@ CREATE TABLE usuarios (
     email VARCHAR(100) UNIQUE NOT NULL,
     usuario VARCHAR(50) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
+    ALTER TABLE usuarios ADD COLUMN token_sessao VARCHAR(255);
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
