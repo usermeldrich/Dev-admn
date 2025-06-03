@@ -43,6 +43,12 @@ switch ($request) {
         require __DIR__ . '/../app/views/cadastro.php';
         break;
 
+        case '/public/admin' :
+    case '/admin':
+        require __DIR__ . '/../app/views/admin.php';
+        break;
+
+
     default:
         http_response_code(404);
         echo "Página não encontrada";

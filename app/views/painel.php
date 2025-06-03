@@ -8,28 +8,56 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-// Verifica se usuário solicitou ou devolveu
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $usuario_id = $_SESSION['usuario_id'];
-    $veiculo_id = $_POST['veiculo_id'];
+$usuario_id = $_SESSION['usuario_id'];
 
-    if (isset($_POST['solicitar'])) {
-        // Garante que o usuário não tem outro veículo
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM veiculos WHERE status = 'solicitado' AND usuario_id = ?");
+// Verifica ações de solicitar ou devolver veículo
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (isset($_POST['solicitar'], $_POST['veiculo_id'])) {
+        $veiculo_id = (int)$_POST['veiculo_id'];
+
+        // Verifica se o usuário já tem uma solicitação pendente
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM solicitacoes WHERE usuario_id = ? AND status = 'pendente'");
         $stmt->execute([$usuario_id]);
         if ($stmt->fetchColumn() == 0) {
-            $stmt = $pdo->prepare("UPDATE veiculos SET status = 'solicitado', usuario_id = ? WHERE id = ?");
+            // Insere nova solicitação
+            $stmt = $pdo->prepare("INSERT INTO solicitacoes (usuario_id, veiculo_id, status) VALUES (?, ?, 'pendente')");
             $stmt->execute([$usuario_id, $veiculo_id]);
         }
-    } elseif (isset($_POST['devolver'])) {
-        $stmt = $pdo->prepare("UPDATE veiculos SET status = 'disponivel', usuario_id = NULL WHERE id = ? AND usuario_id = ?");
-        $stmt->execute([$veiculo_id, $usuario_id]);
+    }
+
+    if (isset($_POST['devolver'], $_POST['veiculo_id'])) {
+        $veiculo_id = (int)$_POST['veiculo_id'];
+
+        // Atualiza a solicitação para marcar como devolvida
+        $stmt = $pdo->prepare("UPDATE solicitacoes SET status = 'devolvido', data_devolucao = CURRENT_TIMESTAMP 
+                               WHERE usuario_id = ? AND veiculo_id = ? AND status = 'pendente'");
+        $stmt->execute([$usuario_id, $veiculo_id]);
+    }
+
+    // Admin redireciona se a senha estiver correta
+    if (isset($_POST['acesso_admin']) && isset($_POST['senha_admin'])) {
+        if ($_POST['senha_admin'] === '123adm') {
+            header('Location: ' . BASE_URL . '/admin');
+            exit;
+        } else {
+            $erro_admin = "Senha incorreta!";
+        }
     }
 }
 
-// Pega lista de veículos
-$stmt = $pdo->query("SELECT * FROM veiculos ORDER BY reserva ASC");
+// Busca todos os veículos
+$stmt = $pdo->query("SELECT * FROM veiculos ORDER BY modelo ASC");
 $veiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Verifica quais veículos estão com solicitação pendente
+$stmt = $pdo->query("SELECT veiculo_id, usuario_id FROM solicitacoes WHERE status = 'pendente'");
+$ocupados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Cria um mapa rápido para saber quem está com qual veículo
+$veiculoOcupadoPor = [];
+foreach ($ocupados as $s) {
+    $veiculoOcupadoPor[$s['veiculo_id']] = $s['usuario_id'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -41,49 +69,41 @@ $veiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body class="painel-bg">
 
-    <div class="painel-container">
-        <h2>Bem-vindo, <?= $_SESSION['usuario_nome'] ?>!</h2>
-        <h3>Lista de Veículos</h3>
+<div class="painel-container">
+    <h2>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario_nome']) ?>!</h2>
+    <h3>Lista de Veículos</h3>
 
-        <div class="veiculos-lista">
-            <?php foreach ($veiculos as $v): ?>
-                <?php
-                    $ocupado = $v['status'] === 'solicitado';
-                    $ehUsuario = $v['usuario_id'] == $_SESSION['usuario_id'];
-                ?>
-                <div class="veiculo-card <?= $ocupado && !$ehUsuario ? 'opaco' : '' ?>">
-                    <strong><?= $v['nome'] ?></strong>
-                    <form method="POST">
-                        <input type="hidden" name="veiculo_id" value="<?= $v['id'] ?>">
-                        <?php if (!$ocupado): ?>
-                            <button type="submit" name="solicitar">Solicitar</button>
-                        <?php elseif ($ehUsuario): ?>
-                            <button type="submit" name="devolver">Devolver</button>
-                        <?php else: ?>
-                            <button disabled>Indisponível</button>
-                        <?php endif; ?>
-                    </form>
-                </div>
-            <?php endforeach; ?>
-        </div>
-
-        <form class="admin-form" method="POST">
-            <input type="password" name="senha_admin" placeholder="Senha do administrador">
-            <button type="submit" name="acesso_admin">Acesso Administrativo</button>
-        </form>
-
-        <?php
-        if (isset($_POST['acesso_admin'])) {
-            $senha = $_POST['senha_admin'];
-            if ($senha === '123adm') { // senha fixa no código
-                header('Location: ' . BASE_URL . '/admin.php');
-                exit;
-            } else {
-                echo '<p class="erro-senha">Senha incorreta!</p>';
-            }
-        }
-        ?>
+    <div class="veiculos-lista">
+        <?php foreach ($veiculos as $v): ?>
+            <?php
+                $ocupado = array_key_exists($v['id'], $veiculoOcupadoPor);
+                $ehUsuario = $ocupado && $veiculoOcupadoPor[$v['id']] == $usuario_id;
+            ?>
+            <div class="veiculo-card <?= $ocupado && !$ehUsuario ? 'opaco' : ($ehUsuario ? 'proprio' : '') ?>">
+                <strong><?= htmlspecialchars($v['modelo']) ?> - <?= htmlspecialchars($v['placa']) ?></strong>
+                <form method="POST">
+                    <input type="hidden" name="veiculo_id" value="<?= $v['id'] ?>">
+                    <?php if (!$ocupado): ?>
+                        <button type="submit" name="solicitar">Solicitar</button>
+                    <?php elseif ($ehUsuario): ?>
+                        <button type="submit" name="devolver">Devolver</button>
+                    <?php else: ?>
+                        <button disabled>Indisponível</button>
+                    <?php endif; ?>
+                </form>
+            </div>
+        <?php endforeach; ?>
     </div>
+
+    <form class="admin-form" method="POST">
+        <input type="password" name="senha_admin" placeholder="Senha do administrador">
+        <button type="submit" name="acesso_admin">Acesso Administrativo</button>
+    </form>
+
+    <?php if (isset($erro_admin)): ?>
+        <p class="erro-senha"><?= $erro_admin ?></p>
+    <?php endif; ?>
+</div>
 
 </body>
 </html>
